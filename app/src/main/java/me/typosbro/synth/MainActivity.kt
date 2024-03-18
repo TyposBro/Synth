@@ -141,7 +141,7 @@ fun ControlsPanel(modifier: Modifier = Modifier) {
 @Composable
 fun PitchControl(modifier: Modifier) {
 
-    var frequency by  rememberSaveable { mutableFloatStateOf(300f) }
+    var frequency by rememberSaveable { mutableFloatStateOf(300f) }
 
     Text(
         text = stringResource(id = R.string.frequency),
@@ -149,16 +149,24 @@ fun PitchControl(modifier: Modifier) {
     )
     Slider(
         value = frequency,
-        onValueChange = { frequency = it},
+        onValueChange = { frequency = it },
         valueRange = 40f..3000f,
         modifier = modifier
     )
     Text(text = stringResource(id = R.string.frequency_value, frequency))
+   
 }
+
+
 
 @Composable
 fun PlayControl(modifier: Modifier) {
-
+    Button(
+        onClick = { /*TODO*/ },
+        modifier = modifier
+    ) {
+        Text(text = stringResource(id = R.string.play))
+    }
 }
 
 
