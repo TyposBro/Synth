@@ -16,6 +16,12 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -127,23 +133,27 @@ fun ControlsPanel(modifier: Modifier = Modifier) {
                 .fillMaxHeight()
                 .fillMaxWidth()
         ) {
-            PitchControl(modifier)
-            PlayControl(modifier)
+
         }
     }
 }
 
 @Composable
 fun PitchControl(modifier: Modifier) {
+
+    var frequency by  rememberSaveable { mutableFloatStateOf(300f) }
+
     Text(
-        text = "Frequency",
+        text = stringResource(id = R.string.frequency),
         modifier = modifier
     )
     Slider(
-        value = 300f,
-        onValueChange = { /*TODO*/},
+        value = frequency,
+        onValueChange = { frequency = it},
+        valueRange = 40f..3000f,
         modifier = modifier
     )
+    Text(text = stringResource(id = R.string.frequency_value, frequency))
 }
 
 @Composable
