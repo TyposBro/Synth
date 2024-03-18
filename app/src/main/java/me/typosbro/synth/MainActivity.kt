@@ -143,20 +143,34 @@ fun PitchControl(modifier: Modifier) {
 
     var frequency by rememberSaveable { mutableFloatStateOf(300f) }
 
-    Text(
-        text = stringResource(id = R.string.frequency),
-        modifier = modifier
-    )
-    Slider(
+    PitchControlUi(
+        label = stringResource(id = R.string.frequency),
         value = frequency,
         onValueChange = { frequency = it },
         valueRange = 40f..3000f,
+        frequencyValueLabel = stringResource(id = R.string.frequency_value, frequency),
         modifier = modifier
     )
-    Text(text = stringResource(id = R.string.frequency_value, frequency))
-   
 }
 
+@Composable
+fun PitchControlUi(
+    label: String,
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    frequencyValueLabel: String,
+    modifier: Modifier
+) {
+    Text(text = label)
+    Slider(
+        value = value,
+        onValueChange = onValueChange,
+        valueRange = valueRange,
+        modifier = modifier
+    )
+    Text(text = frequencyValueLabel)
+}
 
 
 @Composable
