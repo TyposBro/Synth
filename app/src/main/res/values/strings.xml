@@ -2,5 +2,10 @@
     <string name="app_name">Synth</string>
     <string name="frequency">Frequency</string>
     <string name="frequency_value">%.1f Hz</string>
+    <string name="sine">Sine</string>
+    <string name="triangle">Triangle</string>
+    <string name="square">Square</string>
+    <string name="sawtooth">Sawtooth</string>
+
     <string name="play">Play</string>
 </resources>

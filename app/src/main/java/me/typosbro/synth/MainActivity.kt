@@ -4,13 +4,19 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.VolumeMute
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -18,14 +24,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import me.typosbro.synth.ui.theme.SynthTheme
 
 class MainActivity : ComponentActivity() {
@@ -49,9 +56,9 @@ class MainActivity : ComponentActivity() {
 fun SynthApp(modifier: Modifier = Modifier) {
 
     Column(
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
-        modifier = modifier.fillMaxSize(),
     )
     {
 
@@ -114,7 +121,7 @@ fun ControlsPanel(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.5f),
+            .fillMaxHeight(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -127,13 +134,12 @@ fun ControlsPanel(modifier: Modifier = Modifier) {
         }
 
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
             modifier = modifier
-                .fillMaxHeight()
-                .fillMaxWidth()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly,
         ) {
-
+            VolumeControl(modifier)
         }
     }
 }
@@ -181,6 +187,41 @@ fun PlayControl(modifier: Modifier) {
     ) {
         Text(text = stringResource(id = R.string.play))
     }
+}
+
+@Composable
+fun VolumeControl(modifier: Modifier = Modifier) {
+    var volume by rememberSaveable { mutableFloatStateOf(50f) }
+
+    VolumeControlUi(
+        value = volume,
+        onValueChange = { volume = it },
+        valueRange = -60f..0f,
+        modifier = modifier
+    )
+
+}
+
+@Composable
+fun VolumeControlUi(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    modifier: Modifier
+) {
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val sliderHeight = screenHeight / 4
+
+    Icon(imageVector = Icons.Filled.VolumeUp, contentDescription = null)
+    Slider(
+        value = value,
+        onValueChange = onValueChange,
+        valueRange = valueRange,
+        modifier = modifier
+            .width(sliderHeight)
+            .rotate(270f)
+    )
+    Icon(imageVector = Icons.Filled.VolumeMute, contentDescription = null)
 }
 
 
