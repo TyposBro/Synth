@@ -1,5 +1,6 @@
 package me.typosbro.synth
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,9 +13,8 @@ class SynthViewModel : ViewModel() {
     var wavetableSynth: WavetableSynth? = null
         set(value) {
             field = value
-           applyParameters()
+            applyParameters()
         }
-
 
 
     private var _frequency = MutableLiveData<Float>(400f)
@@ -39,7 +39,7 @@ class SynthViewModel : ViewModel() {
     }
 
 
-    private fun getPositionFromFrequencyInHz(frequencyInHz: Float): Float {
+    fun getPositionFromFrequencyInHz(frequencyInHz: Float): Float {
         val rangePosition = rangePositionFromValue(frequencyRange, frequencyInHz)
         return exponentialToLinear(rangePosition)
     }
@@ -96,7 +96,7 @@ class SynthViewModel : ViewModel() {
 
     fun setVolume(volumeInDb: Float) {
         _volume.value = volumeInDb
-
+        Log.d("SynthViewModel", "setVolume: $volumeInDb")
         viewModelScope.launch {
             wavetableSynth?.setVolume(volumeInDb)
         }
@@ -124,10 +124,8 @@ class SynthViewModel : ViewModel() {
         viewModelScope.launch {
             if (wavetableSynth?.isPlaying() == true) {
                 wavetableSynth?.stop()
-//                _playButtonLabel.value = R.string.play
             } else {
                 wavetableSynth?.play(wavetable, _frequency.value!!, 1000)
-//                _playButtonLabel.value = R.string.stop
             }
 
             updatePlayButtonLabel()
@@ -150,7 +148,7 @@ class SynthViewModel : ViewModel() {
             wavetableSynth?.setFrequency(_frequency.value!!)
             wavetableSynth?.setVolume(_volume.value!!)
             wavetableSynth?.setWavetable(wavetable)
-            
+
             updatePlayButtonLabel()
         }
     }

@@ -22,15 +22,15 @@ class LoggingWavetableSynth : WavetableSynth {
     }
 
     override suspend fun setFrequency(frequency: Float) {
- Log.d(TAG, "setFrequency() called $frequency")
+        Log.d(TAG, "setFrequency() called $frequency")
     }
 
     override suspend fun setVolume(volume: Float) {
- Log.d(TAG, "setVolume() called $volume")
+        Log.d(TAG, "setVolume() called $volume")
     }
 
     override suspend fun setWavetable(wavetable: Wavetable) {
- Log.d(TAG, "setWavetable() called $wavetable")
+        Log.d(TAG, "setWavetable() called $wavetable")
     }
 
 }

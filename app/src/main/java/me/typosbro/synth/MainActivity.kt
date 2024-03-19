@@ -4,7 +4,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.border
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +23,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,40 +38,50 @@ import androidx.compose.ui.unit.dp
 import me.typosbro.synth.ui.theme.SynthTheme
 
 class MainActivity : ComponentActivity() {
+    private val viewModel by viewModels<SynthViewModel>()
+    val synth = LoggingWavetableSynth()
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        viewModel.wavetableSynth = synth
         setContent {
             SynthTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    SynthApp(modifier = Modifier)
+                    SynthApp(viewModel = viewModel, modifier = Modifier)
                 }
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.applyParameters()
+    }
 }
 
+
 @Composable
-fun SynthApp(modifier: Modifier = Modifier) {
+fun SynthApp(viewModel: SynthViewModel, modifier: Modifier = Modifier) {
 
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
-    )
-    {
+    ) {
 
-        SelectionPanel(modifier)
-        ControlsPanel(modifier)
+        SelectionPanel(viewModel, modifier)
+        ControlsPanel(viewModel, modifier)
     }
 }
 
 
 @Composable
-fun SelectionPanel(modifier: Modifier = Modifier) {
+fun SelectionPanel(
+    viewModel: SynthViewModel, modifier: Modifier = Modifier
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
@@ -80,33 +92,34 @@ fun SelectionPanel(modifier: Modifier = Modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = modifier
-                .fillMaxSize()
+            modifier = modifier.fillMaxSize()
         ) {
             Text(text = stringResource(id = R.string.app_name))
-            SelectionButtons(modifier)
+            SelectionButtons(viewModel, modifier)
         }
     }
 }
 
 @Composable
-fun SelectionButtons(modifier: Modifier = Modifier) {
+fun SelectionButtons(
+    viewModel: SynthViewModel, modifier: Modifier = Modifier
+) {
     Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = modifier
-            .fillMaxWidth()
+        horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth()
     ) {
-        for (wavetable in arrayOf("Sine", "Saw", "Square", "Triangle")) {
-            WavetableButton(label = wavetable, onClick = { /*TODO*/ }, modifier)
+        for (wavetable in Wavetable.entries) {
+            WavetableButton(
+                label = stringResource(id = wavetable.toResourceString()),
+                onClick = { viewModel.setWavetable(wavetable) },
+                modifier
+            )
         }
     }
 }
 
 @Composable
 fun WavetableButton(
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    label: String, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     Button(onClick = onClick, modifier = modifier) {
         Text(text = label)
@@ -115,7 +128,9 @@ fun WavetableButton(
 
 
 @Composable
-fun ControlsPanel(modifier: Modifier = Modifier) {
+fun ControlsPanel(
+    viewModel: SynthViewModel, modifier: Modifier = Modifier
+) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -129,32 +144,45 @@ fun ControlsPanel(modifier: Modifier = Modifier) {
                 .fillMaxHeight()
                 .fillMaxWidth(0.7f)
         ) {
-            PitchControl(modifier)
-            PlayControl(modifier)
+            PitchControl(viewModel, modifier)
+            PlayControl(viewModel, modifier)
         }
 
         Column(
-            modifier = modifier
-                .fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
-            VolumeControl(modifier)
+            VolumeControl(viewModel = viewModel, modifier = modifier)
         }
     }
 }
 
 @Composable
-fun PitchControl(modifier: Modifier) {
+fun PitchControl(viewModel: SynthViewModel, modifier: Modifier) {
 
-    var frequency by rememberSaveable { mutableFloatStateOf(300f) }
+    // if the frequency changes, recompose this composable
+    val frequency by viewModel.frequency.observeAsState()
+    // the slider position state is hoisted by this composable; no need to embed it into
+    // the ViewModel, which ideally, shouldn't be aware of the UI.
+    // When the slider position changes, this composable will be recomposed as we explained in
+    // the UI tutorial.
+    var sliderPosition by rememberSaveable {
+        mutableFloatStateOf(
+            // we use the ViewModel's convenience function to get the initial slider position
+            viewModel.getPositionFromFrequencyInHz(frequency!!)
+        )
+    }
 
     PitchControlUi(
         label = stringResource(id = R.string.frequency),
-        value = frequency,
-        onValueChange = { frequency = it },
-        valueRange = 40f..3000f,
-        frequencyValueLabel = stringResource(id = R.string.frequency_value, frequency),
+        value = sliderPosition,
+        onValueChange = {
+            sliderPosition = it
+            viewModel.setFrequency(it)
+        },
+        valueRange = 0f..1f,
+        frequencyValueLabel = stringResource(id = R.string.frequency_value, frequency!!),
         modifier = modifier
     )
 }
@@ -170,33 +198,33 @@ fun PitchControlUi(
 ) {
     Text(text = label)
     Slider(
-        value = value,
-        onValueChange = onValueChange,
-        valueRange = valueRange,
-        modifier = modifier
+        value = value, onValueChange = onValueChange, valueRange = valueRange, modifier = modifier
     )
     Text(text = frequencyValueLabel)
 }
 
 
 @Composable
-fun PlayControl(modifier: Modifier) {
+fun PlayControl(viewModel: SynthViewModel, modifier: Modifier) {
+    val label by viewModel.playButtonLabel.observeAsState()
     Button(
-        onClick = { /*TODO*/ },
-        modifier = modifier
+        onClick = viewModel::onPlayButtonClicked, modifier = modifier
     ) {
-        Text(text = stringResource(id = R.string.play))
+        Text(text = stringResource(id = label!!))
     }
 }
 
 @Composable
-fun VolumeControl(modifier: Modifier = Modifier) {
-    var volume by rememberSaveable { mutableFloatStateOf(50f) }
+fun VolumeControl(
+    viewModel: SynthViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val volume by viewModel.volume.observeAsState()
 
     VolumeControlUi(
-        value = volume,
-        onValueChange = { volume = it },
-        valueRange = -60f..0f,
+        value = volume!!,
+        onValueChange = { viewModel.setVolume(it) },
+        valueRange = viewModel.volumeRange,
         modifier = modifier
     )
 
@@ -229,6 +257,7 @@ fun VolumeControlUi(
 @Composable
 fun GreetingPreview() {
     SynthTheme {
-        SynthApp()
+        val viewModel = SynthViewModel()
+        SynthApp(viewModel)
     }
 }
