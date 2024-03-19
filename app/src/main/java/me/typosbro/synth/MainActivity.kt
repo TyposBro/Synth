@@ -39,12 +39,17 @@ import me.typosbro.synth.ui.theme.SynthTheme
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<SynthViewModel>()
-    val synth = LoggingWavetableSynth()
+    val synth = NativeWavetableSynth()
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        lifecycle.addObserver(synth)
+
         viewModel.wavetableSynth = synth
+
         setContent {
             SynthTheme {
                 Surface(
