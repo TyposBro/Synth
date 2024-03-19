@@ -25,7 +25,7 @@ class NativeWavetableSynth : WavetableSynth, DefaultLifecycleObserver {
 
     companion object {
         init {
-            System.loadLibrary("wavetablesynthesizer")
+            System.loadLibrary("synth")
         }
     }
 
