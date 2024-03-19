@@ -125,7 +125,7 @@ class SynthViewModel : ViewModel() {
             if (wavetableSynth?.isPlaying() == true) {
                 wavetableSynth?.stop()
             } else {
-                wavetableSynth?.play(wavetable, _frequency.value!!, 1000)
+                wavetableSynth?.play()
             }
 
             updatePlayButtonLabel()

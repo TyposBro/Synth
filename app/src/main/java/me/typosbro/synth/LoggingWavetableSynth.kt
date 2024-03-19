@@ -6,7 +6,7 @@ class LoggingWavetableSynth : WavetableSynth {
 
     private var isPlaying = false
     private val TAG = "LoggingWavetableSynth"
-    override suspend fun play(wavetable: Wavetable, frequency: Float, duration: Long) {
+    override suspend fun play() {
         Log.d(TAG, "play() called")
         isPlaying = true
     }

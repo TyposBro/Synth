@@ -29,7 +29,7 @@ enum class Wavetable {
 }
 
 interface WavetableSynth {
-    suspend fun play(wavetable: Wavetable, frequency: Float, duration: Long)
+    suspend fun play()
     suspend fun stop()
     suspend fun isPlaying(): Boolean
     suspend fun setFrequency(frequency: Float)
