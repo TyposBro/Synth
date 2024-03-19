@@ -2,6 +2,8 @@ package me.typosbro.synth
 
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class NativeWavetableSynth : WavetableSynth, DefaultLifecycleObserver {
     // Handle to native wavetable synth class that holds memory address of native object
@@ -19,7 +21,7 @@ class NativeWavetableSynth : WavetableSynth, DefaultLifecycleObserver {
     private external fun isPlaying(handle: Long): Boolean
     private external fun setFrequency(handle: Long, frequency: Float)
     private external fun setVolume(handle: Long, volume: Float)
-    private external fun setWavetable(handle: Long, wavetable: Wavetable)
+    private external fun setWavetable(handle: Long, wavetable: Int)
 
     companion object {
         init {
@@ -37,7 +39,7 @@ class NativeWavetableSynth : WavetableSynth, DefaultLifecycleObserver {
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
         synchronized(synthMutex) {
-            if (nativeWavetableSynthHandle == 0L){
+            if (nativeWavetableSynthHandle == 0L) {
                 return
             }
             destroy(nativeWavetableSynthHandle)
@@ -46,28 +48,46 @@ class NativeWavetableSynth : WavetableSynth, DefaultLifecycleObserver {
     }
 
 
-    override suspend fun play(wavetable: Wavetable, frequency: Float, duration: Long) {
-        TODO("Not yet implemented")
+    override suspend fun play() = withContext(Dispatchers.Default) {
+        synchronized(synthMutex) {
+            createNativeHandle()
+            play(nativeWavetableSynthHandle)
+        }
     }
 
     override suspend fun stop() {
-        TODO("Not yet implemented")
+        synchronized(synthMutex) {
+            createNativeHandle()
+            stop(nativeWavetableSynthHandle)
+        }
     }
 
-    override suspend fun isPlaying(): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun isPlaying(): Boolean = withContext(Dispatchers.Default) {
+        synchronized(synthMutex) {
+            createNativeHandle()
+            return@withContext isPlaying(nativeWavetableSynthHandle)
+        }
     }
 
-    override suspend fun setFrequency(frequency: Float) {
-        TODO("Not yet implemented")
+    override suspend fun setFrequency(frequency: Float) = withContext(Dispatchers.Default) {
+        synchronized(synthMutex) {
+            createNativeHandle()
+            setFrequency(nativeWavetableSynthHandle, frequency)
+        }
     }
 
-    override suspend fun setVolume(volume: Float) {
-        TODO("Not yet implemented")
+    override suspend fun setVolume(volume: Float) = withContext(Dispatchers.Default) {
+        synchronized(synthMutex) {
+            createNativeHandle()
+            setVolume(nativeWavetableSynthHandle, volume)
+        }
     }
 
-    override suspend fun setWavetable(wavetable: Wavetable) {
-        TODO("Not yet implemented")
+    override suspend fun setWavetable(wavetable: Wavetable) = withContext(Dispatchers.Default) {
+        synchronized(synthMutex) {
+            createNativeHandle()
+            setWavetable(nativeWavetableSynthHandle, wavetable.ordinal)
+        }
     }
 
     private fun createNativeHandle() {
