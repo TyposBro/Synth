@@ -30,8 +30,8 @@ namespace wavetablesynth {
         LOGD("WavetableSynth::setVolume() called with %.2f", volume);
     }
 
-    void WavetableSynth::setWaveform(Waveform waveform) {
-        LOGD("WavetableSynth::setWaveform() called with %d", static_cast<int>(waveform));
+    void WavetableSynth::setWavetable(wavetablesynth::Wavetable wavetable)  {
+        LOGD("WavetableSynth::setWaveform() called with %d", static_cast<int>(wavetable));
     }
 
 }

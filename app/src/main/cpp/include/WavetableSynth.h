@@ -4,7 +4,7 @@
 #pragma once
 
 namespace wavetablesynth {
-    enum class Waveform {
+    enum class Wavetable {
         SINE,
         TRIANGLE,
         SQUARE,
@@ -21,7 +21,7 @@ namespace wavetablesynth {
         bool isPlaying();
         void setFrequency(float frequency);
         void setVolume(float volume);
-        void setWaveform(Waveform waveform);
+        void setWavetable(Wavetable waveform);
     private:
         bool _isPlaying = false;
     };
