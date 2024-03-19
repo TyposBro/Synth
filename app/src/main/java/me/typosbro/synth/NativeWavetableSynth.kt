@@ -20,7 +20,11 @@ class NativeWavetableSynth : WavetableSynth, DefaultLifecycleObserver {
     private external fun setVolume(handle: Long, volume: Float)
     private external fun setWavetable(handle: Long, wavetable: Wavetable)
 
-   
+    companion object {
+        init {
+            System.loadLibrary("wavetablesynthesizer")
+        }
+    }
 
 
     override suspend fun play(wavetable: Wavetable, frequency: Float, duration: Long) {
