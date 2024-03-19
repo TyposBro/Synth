@@ -65,6 +65,11 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         viewModel.applyParameters()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(synth)
+    }
 }
 
 
