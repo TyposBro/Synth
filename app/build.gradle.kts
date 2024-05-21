@@ -23,7 +23,7 @@ android {
         @Suppress("UnstableApiUsage")
         externalNativeBuild {
             cmake {
-                cppFlags += "-std=c++2a"
+                cppFlags += "-std=c++17"
                 arguments("-DANDROID_STL=c++_shared")
             }
         }

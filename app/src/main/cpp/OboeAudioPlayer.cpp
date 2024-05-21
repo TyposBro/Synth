@@ -1,10 +1,13 @@
-#include "include/OboeAudioPlayer.h"
-#include "include/AudioSource.h"
+#include "OboeAudioPlayer.h"
+
+#include <utility>
+#include "AudioSource.h"
+#include "Log.h"
 
 
 using namespace oboe;
 
-namespace wavetable_synth {
+namespace wavetablesynth {
     OboeAudioPlayer::OboeAudioPlayer(std::shared_ptr <AudioSource> source, int samplingRate)
             : _source(std::move(source)),
               _samplingRate(samplingRate) {
@@ -25,7 +28,7 @@ namespace wavetable_synth {
                 ->setFormat(AudioFormat::Float)
                 ->setChannelCount(channelCount)
                 ->setSampleRateConversionQuality(SampleRateConversionQuality::Best)
-                ->openStream(&_stream);
+                ->openStream(_stream);
         if (result != Result::OK) {
             return static_cast<int32_t>(result);
         }
@@ -37,12 +40,13 @@ namespace wavetable_synth {
 
 
     void OboeAudioPlayer::stop() {
+        LOGD("OboeAudioPlayer::stop()");
         if (_stream) {
             _stream->stop();
             _stream->close();
             _stream.reset();
         }
-        _stream->onPlaybackStopped();
+        _source->onPlaybackStopped();
     }
 
 

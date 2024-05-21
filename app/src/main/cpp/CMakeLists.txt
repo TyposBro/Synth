@@ -28,7 +28,10 @@ project("synth")
 add_library(${CMAKE_PROJECT_NAME} SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
         WavetableSynth.cpp
-        synth.cpp)
+        synth.cpp
+        OboeAudioPlayer.cpp
+        WavetableOsc.cpp
+        )
 
 include_directories(include)
 find_package(oboe REQUIRED CONFIG)

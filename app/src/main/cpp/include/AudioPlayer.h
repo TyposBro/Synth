@@ -7,7 +7,7 @@
 
 
 
-namespace wavetable_synth {
+namespace wavetablesynth {
 
     class AudioPlayer {
     public:
@@ -17,12 +17,5 @@ namespace wavetable_synth {
 
         virtual void stop() = 0;
 
-        virtual bool isPlaying() = 0;
-
-        virtual void setFrequency(float frequency) = 0;
-
-        virtual void setVolume(float volume) = 0;
-
-        virtual void setWavetable(int wavetable) = 0;
     };
 }

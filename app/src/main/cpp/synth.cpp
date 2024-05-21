@@ -2,6 +2,7 @@
 #include <memory>
 #include "include/Log.h"
 #include "include/WavetableSynth.h"
+#include "oboe/Oboe.h"
 
 
 extern "C" {

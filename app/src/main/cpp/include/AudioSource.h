@@ -6,7 +6,7 @@
 
 
 
-namespace wavetable_synth {
+namespace wavetablesynth {
 
     class AudioSource {
     public:

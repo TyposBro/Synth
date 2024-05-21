@@ -4,12 +4,12 @@
 #include <oboe/Oboe.h>
 #include "AudioPlayer.h"
 
-namespace wavetable_synth {
+namespace wavetablesynth {
 
     class AudioSource;
 
     class OboeAudioPlayer
-            : public wavetable_synth::AudioPlayer, public oboe::AudioStreamDataCallback {
+            : public wavetablesynth::AudioPlayer, public oboe::AudioStreamDataCallback {
     public:
         static constexpr auto channelCount = oboe::ChannelCount::Mono;
 
@@ -28,5 +28,5 @@ namespace wavetable_synth {
         std::shared_ptr <AudioSource> _source;
         std::shared_ptr <oboe::AudioStream> _stream;
         int _samplingRate;
-    }
+    };
 }
